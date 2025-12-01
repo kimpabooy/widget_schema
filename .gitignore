@@ -1,0 +1,26 @@
+# Node.js
+node_modules/
+
+# VS Code
+.vscode/
+
+# Screenshots
+screenshots/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+
+# Build
+/dist/
+/build/
+
+# Misc
+*.tmp
+*.swp
