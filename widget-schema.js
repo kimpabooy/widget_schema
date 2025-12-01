@@ -2,9 +2,10 @@ const { chromium } = require('playwright');
 
 (async () => {
     const browser = await chromium.launch({ headless: false }); // Sätt headless till false för att se webbläsaren, true för att köra i bakgrunden
-    const pageToVisit = 'https://widgitonline.com/doc/71358bc50d1c91d3a8341d41af16ff6b'; // Ange den specifika sidan du vill besöka
     const context = await browser.newContext(); // Skapa en ny webbläsarkontext
     const page = await context.newPage(); // Skapa en ny sida i kontexten
+    const pageToVisit = 'https://widgitonline.com/doc/71358bc50d1c91d3a8341d41af16ff6b';
+    
 
     // Gå till den specifika sidan
     await page.goto(pageToVisit);
