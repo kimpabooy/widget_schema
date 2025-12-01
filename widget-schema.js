@@ -7,6 +7,8 @@ const { chromium } = require('playwright');
 
     await page.goto('https://widgitonline.com/doc/71358bc50d1c91d3a8341d41af16ff6b');
 
+    // Vänta på att sidan är helt laddad
+    await page.waitForLoadState('networkidle');
 
     // Hämta alla scheman
     const containers = await page.$$('div.flashcard-page-container');
