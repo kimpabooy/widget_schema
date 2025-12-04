@@ -1,0 +1,6 @@
+{
+  "outputDir": "screenshots",
+  "baseFilename": "Schema_{row}_{day}_{variant}.png",
+  "variants": ["1a", "1b"],
+  "uploadTarget": ""
+}
