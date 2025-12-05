@@ -2,11 +2,41 @@
   {
     "name": "Tomas",
     "days": {
-      "Mån": "https://widgitonline.com/doc/71358bc50d1c91d3a8341d41af16ff6b",
-      "Tis": "https://widgitonline.com/doc/71358bc50d1c91d3a8341d41af16ff6b",
-      "Ons": "https://widgitonline.com/doc/71358bc50d1c91d3a8341d41af16ff6b",
-      "Tor": "https://widgitonline.com/doc/71358bc50d1c91d3a8341d41af16ff6b",
-      "Fre": "https://widgitonline.com/doc/71358bc50d1c91d3a8341d41af16ff6b"
+      "Mån": "71358bc50d1c91d3a8341d41af16ff6b",
+      "Tis": "71358bc50d1c91d3a8341d41af16ff6b",
+      "Ons": "71358bc50d1c91d3a8341d41af16ff6b",
+      "Tor": "71358bc50d1c91d3a8341d41af16ff6b",
+      "Fre": "71358bc50d1c91d3a8341d41af16ff6b"
+    }
+  },
+  {
+    "name": "Anna",
+    "days": {
+      "Mån":"71358bc50d1c91d3a8341d41af16ff6b",
+      "Tis":"71358bc50d1c91d3a8341d41af16ff6b",
+      "Ons":"71358bc50d1c91d3a8341d41af16ff6b",
+      "Tor":"71358bc50d1c91d3a8341d41af16ff6b",
+      "Fre":"71358bc50d1c91d3a8341d41af16ff6b"
+    }
+  },
+  {
+    "name": "Niklas",
+    "days": {
+      "Mån":"71358bc50d1c91d3a8341d41af16ff6b",
+      "Tis":"71358bc50d1c91d3a8341d41af16ff6b",
+      "Ons":"71358bc50d1c91d3a8341d41af16ff6b",
+      "Tor":"71358bc50d1c91d3a8341d41af16ff6b",
+      "Fre":"71358bc50d1c91d3a8341d41af16ff6b"
+    }
+  },
+  {
+    "name": "Sara",
+    "days": {
+      "Mån":"71358bc50d1c91d3a8341d41af16ff6b",
+      "Tis":"71358bc50d1c91d3a8341d41af16ff6b",
+      "Ons":"71358bc50d1c91d3a8341d41af16ff6b",
+      "Tor":"71358bc50d1c91d3a8341d41af16ff6b",
+      "Fre":"71358bc50d1c91d3a8341d41af16ff6b"
     }
   }
 ]
