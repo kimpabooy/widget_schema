@@ -12,8 +12,8 @@ async function processAll() {
     console.log("Startar schemagenerering...");
 
     for (const row of rows) {
-        for (const [day, id] of Object.entries(row.days)) {
-            const url = baseUrl + id;
+        for (const [day, docId] of Object.entries(row.days)) {
+            const url = baseUrl + docId;
             console.log(`Hämtar ${row.name} - ${day}`);
 
             // Generate filenames for each variant
@@ -31,7 +31,7 @@ async function processAll() {
             }
         }
     }
-    console.log("Klar!");
+    console.log("Alla scheman är hämtade!");
 }
 
 module.exports = { processAll };
