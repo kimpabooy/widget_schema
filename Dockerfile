@@ -34,12 +34,15 @@ RUN apt-get update && apt-get install -y \
     wget
 
 RUN npm install
-RUN npm install playwright
+
+RUN npm install playwright express
 RUN npx playwright install
 
 EXPOSE 4000
 
-CMD ["node", "index.js"]
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+CMD ["sh", "start.sh"]
 
 
 
