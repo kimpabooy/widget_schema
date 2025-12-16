@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: widget_schema_app
+    ports:
+      - "4000:4000"
+    volumes:
+      - volume:/app/screenshots
+volumes:
+  volume:
+
+# Explanation:
+# services: Defines the services that make up the application.
+# app: The main application service that builds from the Dockerfile in the current directory.
+# build: Configuration for building the Docker image.
+# context: The build context is set to the current directory, meaning Docker will use the files in this directory to build the image.
+# dockerfile: Specifies the Dockerfile to use for building the image.
+# container_name: Sets a custom name for the container, making it easier to identify.
+# ports: Maps network ports between the host and the container.
+# volumes: Mounts the current directory into the container, allowing for live code updates.
+# environment: Sets environment variables for the container.
+
+
+# The app service builds a Docker image from the Dockerfile located in the current directory.
+# The context is set to the current directory, meaning all files in this directory are available during the build process.
+# The container is named "widget_schema_app" for easy identification.
+# It maps port 4000 of the container to port 4000 on the host machine, allowing access to the application.
+# The current directory is mounted as a volume inside the container at /app/screenshots
+# The NODE_ENV environment variable is set to 'development' to configure the application for a development environment. For production, this could be changed to 'production'.
+# This setup is ideal for local development and testing of the widget schema application.
+
+# RUN INSTRUCTIONS:
+# To run the application, use the command: docker-compose up --build
+
