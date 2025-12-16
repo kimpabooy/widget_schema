@@ -1,8 +1,8 @@
 // Get dependencies and config from other files
 const { scrapeSingleWidgitPage } = require('./scraper');
 const { generateFilename } = require('./utils');
-const PORT = 4000;
 const fs = require('fs');
+const PORT = 4000;
 
 const rows = require('../config/rows.json');
 const settings = require('../config/settings.json');
@@ -12,6 +12,7 @@ const baseUrl = "https://widgitonline.com/doc/";
 async function processAll() {
     console.log("Startar schemagenerering...");
 
+    // Loop through each row and day to scrape and save images
     for (const row of rows) {
         for (const [day, docId] of Object.entries(row.days)) {
             const url = baseUrl + docId;
