@@ -1,6 +1,7 @@
 // Get dependencies and config from other files
 const { scrapeSingleWidgitPage } = require('./scraper');
 const { generateFilename } = require('./utils');
+const PORT = 4000;
 const fs = require('fs');
 
 const rows = require('../config/rows.json');
@@ -31,7 +32,9 @@ async function processAll() {
             }
         }
     }
+
     console.log("Alla scheman är hämtade!");
+    console.log(`Du kan se bilderna här: http://localhost:${PORT}/${settings.outputDir}`);
 }
 
 module.exports = { processAll };
