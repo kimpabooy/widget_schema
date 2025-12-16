@@ -12,48 +12,48 @@
   {
     "name": "250 JL",
     "days": {
-      "Mån":"6aea0a32cdfdeab4915824dfa865a54f",
-      "Tis":"6d1d1b2c237753cad7e6d47616214947",
-      "Ons":"eb59437780f4d3d70231338b29319f01",
-      "Tor":"bb910ba506a3bc289bf3ec37bbd227d8",
-      "Fre":"6bea8c581dbd1695b97da9edb49ce2ea"
+      "Mån": "6aea0a32cdfdeab4915824dfa865a54f",
+      "Tis": "6d1d1b2c237753cad7e6d47616214947",
+      "Ons": "eb59437780f4d3d70231338b29319f01",
+      "Tor": "bb910ba506a3bc289bf3ec37bbd227d8",
+      "Fre": "6bea8c581dbd1695b97da9edb49ce2ea"
     }
   },
   {
     "name": "242 SS",
     "days": {
-      "Mån":"641a4588336824ca3185f1f0a402cc81",
-      "Tis":"db18e34132f5a9f04d1cc57144f5bfa5",
-      "Ons":"c79a9d349042b610537d52ceb3ff7bb5",
-      "Tor":"962a519938fc81910b28cd46b2a65173",
-      "Fre":"e2a768718ebfd6c2cc7ff9dc6092ac9b"
+      "Mån": "641a4588336824ca3185f1f0a402cc81",
+      "Tis": "db18e34132f5a9f04d1cc57144f5bfa5",
+      "Ons": "c79a9d349042b610537d52ceb3ff7bb5",
+      "Tor": "962a519938fc81910b28cd46b2a65173",
+      "Fre": "e2a768718ebfd6c2cc7ff9dc6092ac9b"
     }
   },
   {
     "name": "249 LL",
     "days": {
-      "Mån":"af84cffa4834a6b138d3c92373c6d84b",
-      "Tis":"8b17e269854d4676564a6d11e2021f43",
-      "Fre":"89029ebc5d759d08034e431a35a12df0"
+      "Mån": "af84cffa4834a6b138d3c92373c6d84b",
+      "Tis": "8b17e269854d4676564a6d11e2021f43",
+      "Fre": "89029ebc5d759d08034e431a35a12df0"
     }
   },
   {
     "name": "227 EP",
     "days": {
-      "Mån":"75b10ef03e1ced37138f3ff32a999487",
-      "Tis":"af0629e73ac44c25844ce0bd5c8e44e9",
-      "Ons":"22e7204ffe3604f58e1229bb614c0577",
-      "Tor":"32ab217583f80119caf046cd33f8e645",
-      "Fre":"e950392d6ec910ef2318d3e314924bf5"
+      "Mån": "75b10ef03e1ced37138f3ff32a999487",
+      "Tis": "af0629e73ac44c25844ce0bd5c8e44e9",
+      "Ons": "22e7204ffe3604f58e1229bb614c0577",
+      "Tor": "32ab217583f80119caf046cd33f8e645",
+      "Fre": "e950392d6ec910ef2318d3e314924bf5"
     }
   },
   {
     "name": "245 VA",
     "days": {
-      "Mån":"cf5cee0e7d19bfc81abec3fbf7d77220",
-      "Tis":"901e49ea998dd377884b7a34d9024418",
-      "Tor":"63c91c06f71dfea8ee0c1d1645106845",
-      "Fre":"11da0c6b4945dc9dba8a40c848659d25"
+      "Mån": "cf5cee0e7d19bfc81abec3fbf7d77220",
+      "Tis": "901e49ea998dd377884b7a34d9024418",
+      "Tor": "63c91c06f71dfea8ee0c1d1645106845",
+      "Fre": "11da0c6b4945dc9dba8a40c848659d25"
     }
   }
 ]
