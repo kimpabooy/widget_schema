@@ -32,7 +32,6 @@ async function processAll() {
             }
         }
     }
-
     console.log("Alla scheman är hämtade!");
     console.log(`Du kan se bilderna här: http://localhost:${PORT}/${settings.outputDir}`);
 }
