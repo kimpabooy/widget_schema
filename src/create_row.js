@@ -28,7 +28,7 @@ function addRow(row) {
 
 // Checks if the script is run directly as a script (not imported as a module)
 // if the file run directly, start interactive mode
-// else just export the addRow function
+// else just export the addRow function for use in other files
 if (require.main === module) {
     const readLine = readline.createInterface({
         input: process.stdin,
@@ -49,14 +49,14 @@ if (require.main === module) {
 
     // Ask about each day recursively
     function questionDay() {
-        // If all days are processed, save the row
+        // If all days are processed, save the row and exit
         if (currentDayIndex >= days.length) {
             readLine.close();
             addRow(row);
             return;
         }
 
-        // Ask about the current day
+        // Ask about the current day in the days list
         const day = days[currentDayIndex];
         readLine.question(`Vill du lägga till dokument-id för ${day}? (j/n): `, (yesOrNo) => {
             const answer = yesOrNo.trim().toLowerCase();
