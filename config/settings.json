@@ -1,5 +1,5 @@
 {
   "outputDir": "screenshots",
   "baseFilename": "Schema_{row}_{day}_{variant}.png",
-  "variants": ["1a", "1b", "1c"]
+  "variants": ["1a", "1b"]
 }
