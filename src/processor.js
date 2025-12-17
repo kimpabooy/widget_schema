@@ -1,12 +1,11 @@
 // Get dependencies and config from other files
 const { scrapeSingleWidgitPage } = require('./scraper');
 const { generateFilename } = require('./utils');
-const fs = require('fs');
-const PORT = 4000;
-
 const rows = require('../config/rows.json');
+const fs = require('fs');
 const settings = require('../config/settings.json');
 const baseUrl = "https://widgitonline.com/doc/";
+const PORT = 4000;
 
 // Main function for processing all schemas
 async function processAll() {
