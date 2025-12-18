@@ -1,6 +1,5 @@
 // Get dependencies and config from other files
 const { scrapeSingleWidgitPage } = require('./scraper');
-const { generateFilename } = require('./utils');
 const rows = require('../config/rows.json');
 const fs = require('fs');
 const settings = require('../config/settings.json');
@@ -33,7 +32,15 @@ async function processAll() {
         }
     }
     console.log("Alla scheman är hämtade!");
-    console.log(`Du kan se bilderna här: http://localhost:${PORT}/${settings.outputDir}`);
+    console.log(`Öppna sidan: http://localhost:${PORT}/`);
+}
+
+// Helper function to generate filenames based on the template in settings.json
+function generateFilename(row, day, variant) {
+    return settings.baseFilename
+        .replace('{row}', row)
+        .replace('{day}', day)
+        .replace('{variant}', variant);
 }
 
 module.exports = { processAll };
