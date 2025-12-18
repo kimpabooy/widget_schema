@@ -5,10 +5,9 @@ const filePath = path.join(__dirname, '..', 'config', 'rows.json');
 
 // Create readline interface for user input
 const readLine = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
+    input: process.stdin, // stdin standard input (tangentbord)
+    output: process.stdout // stdout standard output (konsolen)
 });
-
 
 // Help function to read and parse JSON file with error handling
 function readJsonFile(filePath, onError) {
@@ -26,17 +25,17 @@ function readJsonFile(filePath, onError) {
     }
 }
 
-// Menu options, add more if needed
-const menuOptions = [
-    'Visa alla scheman',
-    'Lägg till ett schema',
-    'Ta bort ett schema',
-    'Rensa skärmen',
-    'Avsluta'
-];
-
 // Show the main menu
 function showMenu() {
+
+    // Menu options, add more if needed
+    const menuOptions = [
+        'Visa alla scheman',
+        'Lägg till ett schema',
+        'Ta bort ett schema',
+        'Rensa skärmen',
+        'Avsluta'
+    ];
     console.log('\n--- Schema hantering ---\n');
     menuOptions.forEach((option, idx) => {
         console.log(`${idx + 1}. ${option}`);
@@ -119,14 +118,17 @@ function addRow() {
                 return;
             }
 
-            // Check for duplicate names
+            // Error check
             let data = readJsonFile(filePath, (error) => {
                 console.error('Fel vid tolkning av JSON:', error);
                 showMenu();
             });
+
+            // Check for duplicate names
             if (!Array.isArray(data)) data = [];
             const exists = data.some(r => r.name === name);
             if (exists) {
+                console.clear();
                 console.log('Det finns redan ett schema med det namnet. Ange ett unikt namn.');
                 questionTitle();
                 return;
@@ -139,6 +141,8 @@ function addRow() {
     // Ask if user wants to add document IDs for certain days
     function questionDay() {
         if (currentDayIndex >= days.length) {
+
+            //Error check
             let data = readJsonFile(filePath, (error) => {
                 console.error('Fel vid tolkning av JSON:', error);
                 showMenu();
@@ -170,6 +174,7 @@ function addRow() {
                 questionDay();
             }
         });
+        console.clear();
     }
 
     // Ask for the document ID for a specific day
@@ -201,6 +206,7 @@ function deleteRow() {
             deleteRow();
             return;
         }
+
         if (!fs.existsSync(filePath)) {
             console.log('Inget schema hittat att ta bort.');
             showMenu();
@@ -230,11 +236,13 @@ function deleteRow() {
         const objekt = data[index];
         console.log('\nFöljande schema hittades:\n');
         console.log(JSON.stringify(objekt, null, 2));
+
         function securityQuestion() {
             readLine.question(`\nVill du verkligen ta bort detta schemat? (j/n): `, (answer) => {
                 const choice = answer.trim().toLowerCase();
+
                 if (choice === 'j') {
-                    readLine.question(`Bekräfta borttagning genom att skriva in "${objekt.name}" :  `, (confirmation) => {
+                    readLine.question(`Bekräfta borttagning genom att skriva in det "${objekt.name}" :  `, (confirmation) => {
                         if (confirmation.trim() === objekt.name) {
                             data.splice(index, 1);
                             fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
