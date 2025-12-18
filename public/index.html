@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Schemahantering</title>
+    <link rel="stylesheet" href="styles/styles.css" />
+</head>
+
+<body>
+    <nav class="main-nav">
+        <a href="/" class="nav-link">Schemahantering</a>
+        <a href="/screenshots/" class="nav-link">Schema galleri</a>
+    </nav>
+
+    <!-- Add new schema form -->
+    <h1>Schemahantering</h1>
+    <h2>Lägg till nytt schema</h2>
+    <form id="add-form">
+        <label>Namn: <input type="text" id="name" required></label>
+        <div id="days-inputs"></div>
+        <button type="submit">Lägg till</button>
+    </form>
+
+    <!-- List of schemas -->
+    <div id="schema-list" class="schema-list"></div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
