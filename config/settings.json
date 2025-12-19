@@ -1,5 +1,9 @@
 {
   "outputDir": "screenshots",
   "baseFilename": "Schema_{row}_{day}_{variant}.png",
-  "variants": ["1a", "1b"]
+  "variants": ["1a", "1b"],
+
+  "_comment_outputDir": "The outputDir specifies the directory where the screenshots will be saved.",
+  "_comment_baseFilename": "The baseFilename defines the naming convention for the screenshot files, with placeholders for row, day, and variant. The order of placeholders can be adjusted as needed.",
+  "_comment_variants": "The variants array lists the different schema variants to be captured. Add or remove variants as needed."
 }
