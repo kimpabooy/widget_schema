@@ -14,16 +14,19 @@
     </nav>
 
     <!-- Add new schema form -->
-    <h1>Schemahantering</h1>
-    <h2>Lägg till nytt schema</h2>
-    <form id="add-form">
-        <label>Namn: <input type="text" id="name" required></label>
-        <div id="days-inputs"></div>
-        <button type="submit">Lägg till</button>
-    </form>
 
-    <!-- List of schemas -->
-    <div id="schema-list" class="schema-list"></div>
+    <h1>Schemahantering</h1>
+    <div class="schema-flex-container">
+        <div class="schema-form-container">
+            <h2>Lägg till nytt schema</h2>
+            <form id="add-form">
+                <label>Namn: <input type="text" id="name" required></label>
+                <div id="days-inputs"></div>
+                <button type="submit">Lägg till</button>
+            </form>
+        </div>
+        <div id="schema-list" class="schema-list"></div>
+    </div>
 
     <script src="main.js"></script>
 </body>
