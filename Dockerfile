@@ -40,9 +40,4 @@ RUN npx playwright install
 
 EXPOSE 4000
 
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
-CMD ["sh", "start.sh"]
-
-
-
+CMD ["npm", "start"]

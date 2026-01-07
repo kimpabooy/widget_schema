@@ -3,6 +3,7 @@ const { chromium } = require('playwright');
 // Huvudfunktion för att skrapa Schema
 async function scrapeSingleWidgitPage(url, filenames, outputDir = "screenshots") {
     const browser = await chromium.launch();
+    // const browser = await chromium.launch({ headless: false });
     const context = await browser.newContext();
     const page = await context.newPage();
     let screenshotPaths = [];
@@ -25,10 +26,11 @@ async function scrapeSingleWidgitPage(url, filenames, outputDir = "screenshots")
     // Get all schemas (flashcard containers)
     const containers = await page.$$('div.flashcard-page-container');
 
+
     // Loop through each schema/container
     for (let i = 0; i < containers.length; i++) {
         const inners = await containers[i].$$('div.flashcard-positioned-item-inner');
-        
+
         // Find the grid element in the first inner element that has one
         let grid = null;
         for (const inner of inners) {
@@ -43,6 +45,8 @@ async function scrapeSingleWidgitPage(url, filenames, outputDir = "screenshots")
             screenshotPaths.push(filename);
         }
     }
+
+    // await page.waitForTimeout(2000); // Wait a moment to ensure everything is loaded
     await browser.close();
     return screenshotPaths;
 }
