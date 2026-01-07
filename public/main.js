@@ -1,3 +1,4 @@
+
 const days = ["Mån", "Tis", "Ons", "Tor", "Fre"];
 const daysInputs = document.getElementById('days-inputs');
 days.forEach(day => {
@@ -8,6 +9,52 @@ days.forEach(day => {
     input.id = `day-${day}`;
     label.appendChild(input);
     daysInputs.appendChild(label);
+});
+
+// Lägg till "Uppdatera alla scheman"-knapp
+window.addEventListener('DOMContentLoaded', () => {
+    const updateBtn = document.createElement('button');
+    updateBtn.textContent = 'Uppdatera alla scheman';
+    updateBtn.onclick = async () => {
+        updateBtn.disabled = true;
+        let seconds = 0;
+        const intervalId = setInterval(() => {
+            seconds++;
+            updateBtn.textContent = `Uppdaterar... (${seconds}s)`;
+        }, 1000);
+        try {
+            const res = await fetch('/api/update', { method: 'POST' });
+            const data = await res.json();
+            clearInterval(intervalId);
+            if (data.success) {
+                updateBtn.textContent = 'Alla scheman har hämtats om!';
+                fetchSchemas();
+                setTimeout(() => {
+                    updateBtn.textContent = 'Uppdatera alla scheman';
+                    updateBtn.disabled = false;
+                }, 2500);
+                return;
+            } else {
+                updateBtn.textContent = 'Fel vid uppdatering!';
+                setTimeout(() => {
+                    updateBtn.textContent = 'Uppdatera alla scheman';
+                    updateBtn.disabled = false;
+                }, 3000);
+                return;
+            }
+        } catch (err) {
+            clearInterval(intervalId);
+            updateBtn.textContent = 'Fel vid uppdatering!';
+            setTimeout(() => {
+                updateBtn.textContent = 'Uppdatera alla scheman';
+                updateBtn.disabled = false;
+            }, 3000);
+        }
+    };
+    const btnContainer = document.getElementById('update-btn-container');
+    if (btnContainer) {
+        btnContainer.appendChild(updateBtn);
+    }
 });
 
 function renderSchemaList(schemas) {
