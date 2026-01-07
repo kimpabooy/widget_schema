@@ -1,3 +1,4 @@
+const { processAll } = require('./src/processor');
 const express = require('express');
 const helmet = require('helmet');
 const path = require('path');
@@ -78,13 +79,13 @@ app.get('/screenshots/', (req, res) => {
             <html lang="sv">
             <head>
                 <meta charset="UTF-8">
-                <title>Schema galleri</title>
+                <title>Schemagalleri</title>
                 <link rel="stylesheet" href="/styles/styles.css" />
             </head>
             <body>
                 <nav class="main-nav">
                     <a href="/" class="nav-link">Schemahantering</a>
-                    <a href="/screenshots/" class="nav-link active">Schema galleri</a>
+                    <a href="/screenshots/" class="nav-link active">Schemagalleri</a>
                 </nav>
         `;
         if (!Array.isArray(imageFiles) || imageFiles.length === 0) {
@@ -98,10 +99,16 @@ app.get('/screenshots/', (req, res) => {
     });
 });
 
-// Teapot error handler
-app.use((req, res, next) => {
-    res.status(418).send("I'm a teapot");
+// Hämta om alla scheman genom /api/update 
+app.post('/api/update', async (req, res) => {
+    try {
+        await processAll();
+        res.json({ success: true, message: 'Alla scheman har hämtats om.' });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
 });
+
 
 // 404 handler
 app.use((req, res, next) => {
