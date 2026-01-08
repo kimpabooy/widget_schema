@@ -1,7 +1,15 @@
+const DAYS = ["Mån", "Tis", "Ons", "Tor", "Fre"];
 
-const days = ["Mån", "Tis", "Ons", "Tor", "Fre"];
+// Hjälpfunktion för att återställa knapp efter timeout
+function resetButton(btn, originalText, delay = 2500) {
+    setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }, delay);
+}
+
 const daysInputs = document.getElementById('days-inputs');
-days.forEach(day => {
+DAYS.forEach(day => {
     const label = document.createElement('label');
     label.textContent = `Dokument-ID för ${day}: `;
     const input = document.createElement('input');
@@ -14,7 +22,9 @@ days.forEach(day => {
 // Lägg till "Uppdatera alla scheman"-knapp
 window.addEventListener('DOMContentLoaded', () => {
     const updateBtn = document.createElement('button');
-    updateBtn.textContent = 'Uppdatera alla scheman';
+    const originalText = 'Uppdatera alla Scheman';
+
+    updateBtn.textContent = originalText;
     updateBtn.onclick = async () => {
         updateBtn.disabled = true;
         let seconds = 0;
@@ -29,26 +39,15 @@ window.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 updateBtn.textContent = 'Alla scheman har hämtats om!';
                 fetchSchemas();
-                setTimeout(() => {
-                    updateBtn.textContent = 'Uppdatera alla scheman';
-                    updateBtn.disabled = false;
-                }, 2500);
-                return;
+                resetButton(updateBtn, originalText);
             } else {
                 updateBtn.textContent = 'Fel vid uppdatering!';
-                setTimeout(() => {
-                    updateBtn.textContent = 'Uppdatera alla scheman';
-                    updateBtn.disabled = false;
-                }, 3000);
-                return;
+                resetButton(updateBtn, originalText, 3000);
             }
         } catch (err) {
             clearInterval(intervalId);
             updateBtn.textContent = 'Fel vid uppdatering!';
-            setTimeout(() => {
-                updateBtn.textContent = 'Uppdatera alla scheman';
-                updateBtn.disabled = false;
-            }, 3000);
+            resetButton(updateBtn, originalText, 3000);
         }
     };
     const btnContainer = document.getElementById('update-btn-container');
@@ -59,7 +58,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function renderSchemaList(schemas) {
     const list = document.getElementById('schema-list');
-    list.innerHTML = '<h2>Befintliga scheman</h2>';
+    list.innerHTML = '<h2>Befintliga Scheman</h2>';
     if (!schemas.length) {
         list.innerHTML += '<p>Inga scheman finns.</p>';
         return;
@@ -93,26 +92,51 @@ function renderSchemaList(schemas) {
 }
 
 async function fetchSchemas() {
-    const res = await fetch('/api/schemas');
-    const schemas = await res.json();
-    renderSchemaList(schemas);
+    try {
+        const res = await fetch('/api/schemas');
+        if (!res.ok) throw new Error('Kunde inte hämta scheman');
+        const schemas = await res.json();
+        renderSchemaList(schemas);
+    } catch (err) {
+        console.error('Fel vid hämtning av scheman:', err);
+        const list = document.getElementById('schema-list');
+        list.innerHTML = '<h2>Befintliga Scheman</h2><p style="color:red;">Kunde inte ladda scheman.</p>';
+    }
 }
 
 document.getElementById('add-form').onsubmit = async e => {
     e.preventDefault();
     const name = document.getElementById('name').value.trim();
+    if (!name) {
+        alert('Du måste ange ett namn för schemat.');
+        return;
+    }
     const daysObj = {};
-    days.forEach(day => {
+    DAYS.forEach(day => {
         const val = document.getElementById(`day-${day}`).value.trim();
         if (val) daysObj[day] = val;
     });
-    await fetch('/api/schemas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, days: daysObj })
-    });
-    e.target.reset();
-    fetchSchemas();
+    if (Object.keys(daysObj).length === 0) {
+        alert('Du måste ange minst ett dokument-ID.');
+        return;
+    }
+    try {
+        const res = await fetch('/api/schemas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, days: daysObj })
+        });
+        if (res.status === 409) {
+            alert('Ett schema med detta namn finns redan.');
+            return;
+        }
+        if (!res.ok) throw new Error('Kunde inte lägga till schema');
+        e.target.reset();
+        fetchSchemas();
+    } catch (err) {
+        console.error('Fel vid tillägg av schema:', err);
+        alert('Något gick fel vid tillägg av schemat.');
+    }
 };
 
 fetchSchemas();
