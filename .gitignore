@@ -25,3 +25,6 @@ Thumbs.db
 # Misc
 *.tmp
 *.swp
+
+#Files
+handle_rows.js
