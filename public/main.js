@@ -20,40 +20,84 @@ DAYS.forEach(day => {
 });
 
 // Lägg till "Uppdatera alla scheman"-knapp
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
     const updateBtn = document.createElement('button');
     const originalText = 'Uppdatera alla Scheman';
+    let intervalId = null;
+
+    // Funktion för att starta timer-visning
+    function startTimer(startSeconds = 0) {
+        let seconds = startSeconds;
+        updateBtn.disabled = true;
+        updateBtn.textContent = `Uppdaterar... (${seconds}s)`;
+        intervalId = setInterval(() => {
+            seconds++;
+            updateBtn.textContent = `Uppdaterar... (${seconds}s)`;
+        }, 1000);
+    }
+
+    // Funktion för att stoppa timer och återställa knapp
+    function stopTimer(message, delay = 2500) {
+        if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+        }
+        updateBtn.textContent = message;
+        setTimeout(() => {
+            updateBtn.textContent = originalText;
+            updateBtn.disabled = false;
+        }, delay);
+    }
+
+    // Funktion för att kolla och följa uppdateringsstatus
+    async function checkUpdateStatus() {
+        try {
+            const res = await fetch('/api/update/status');
+            const status = await res.json();
+
+            if (status.isUpdating) {
+                startTimer(status.elapsedSeconds);
+                // Fortsätt polla status tills uppdateringen är klar
+                const pollInterval = setInterval(async () => {
+                    const pollRes = await fetch('/api/update/status');
+                    const pollStatus = await pollRes.json();
+                    if (!pollStatus.isUpdating) {
+                        clearInterval(pollInterval);
+                        stopTimer('Alla scheman har hämtats om!');
+                        fetchSchemas();
+                    }
+                }, 1000);
+            }
+        } catch (err) {
+            console.error('Kunde inte hämta uppdateringsstatus:', err);
+        }
+    }
 
     updateBtn.textContent = originalText;
     updateBtn.onclick = async () => {
         updateBtn.disabled = true;
-        let seconds = 0;
-        const intervalId = setInterval(() => {
-            seconds++;
-            updateBtn.textContent = `Uppdaterar... (${seconds}s)`;
-        }, 1000);
+        startTimer(0);
         try {
             const res = await fetch('/api/update', { method: 'POST' });
             const data = await res.json();
-            clearInterval(intervalId);
             if (data.success) {
-                updateBtn.textContent = 'Alla scheman har hämtats om!';
+                stopTimer('Alla scheman har hämtats om!');
                 fetchSchemas();
-                resetButton(updateBtn, originalText);
             } else {
-                updateBtn.textContent = 'Fel vid uppdatering!';
-                resetButton(updateBtn, originalText, 3000);
+                stopTimer(data.message || 'Fel vid uppdatering!', 3000);
             }
         } catch (err) {
-            clearInterval(intervalId);
-            updateBtn.textContent = 'Fel vid uppdatering!';
-            resetButton(updateBtn, originalText, 3000);
+            stopTimer('Fel vid uppdatering!', 3000);
         }
     };
+
     const btnContainer = document.getElementById('update-btn-container');
     if (btnContainer) {
         btnContainer.appendChild(updateBtn);
     }
+
+    // Kolla status vid sidladdning
+    await checkUpdateStatus();
 });
 
 function renderSchemaList(schemas) {
