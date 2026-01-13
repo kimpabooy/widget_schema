@@ -26,8 +26,24 @@ const createError = (message, status) => {
     return error;
 };
 
-// Säkerhetsinställningar
-app.use(helmet()); // Lägger till säkerhetsheaders
+
+// allowedFrameAncestors are used to allow embedding the site in specified domains.
+const allowedFrameAncestors = [
+    "'self'",
+    "https://ankaret.utvecklingfalkenberg.se"
+];
+
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+                "frame-ancestors": allowedFrameAncestors
+            }
+        }
+    })
+);
+
 app.disable('x-powered-by'); // Döljer att servern kör Express
 app.use(express.json());
 
