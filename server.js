@@ -217,10 +217,13 @@ app.post('/api/schemas', (req, res, next) => {
         }
     }
 
-    const { name, days } = req.body;
+    let { name, days } = req.body;
     if (!name || typeof name !== 'string' || !days || typeof days !== 'object') {
         return next(createError('Felaktig data.', 400));
     }
+
+    // Trimma och ersätt mellanslag med understreck
+    name = name.trim().replace(/ +/g, "_");
 
     if (data.some(r => r.name === name)) {
         return next(createError('Schema med detta namn finns redan.', 409));
