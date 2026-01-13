@@ -1,6 +1,6 @@
 [
   {
-    "name": "248 AM",
+    "name": "248_AM",
     "days": {
       "Mån": "fd768d0aca49ffa32783b6c432b067de",
       "Tis": "e8391a8c653a72c6781dba9fdc9e0710",
@@ -10,7 +10,7 @@
     }
   },
   {
-    "name": "250 JL",
+    "name": "250_JL",
     "days": {
       "Mån": "6aea0a32cdfdeab4915824dfa865a54f",
       "Tis": "6d1d1b2c237753cad7e6d47616214947",
@@ -20,7 +20,7 @@
     }
   },
   {
-    "name": "242 SS",
+    "name": "242_SS",
     "days": {
       "Mån": "641a4588336824ca3185f1f0a402cc81",
       "Tis": "db18e34132f5a9f04d1cc57144f5bfa5",
@@ -30,7 +30,7 @@
     }
   },
   {
-    "name": "249 LL",
+    "name": "249_LL",
     "days": {
       "Mån": "af84cffa4834a6b138d3c92373c6d84b",
       "Tis": "8b17e269854d4676564a6d11e2021f43",
@@ -38,7 +38,7 @@
     }
   },
   {
-    "name": "227 EP",
+    "name": "227_EP",
     "days": {
       "Mån": "75b10ef03e1ced37138f3ff32a999487",
       "Tis": "af0629e73ac44c25844ce0bd5c8e44e9",
@@ -48,7 +48,7 @@
     }
   },
   {
-    "name": "245 VA",
+    "name": "245_VA",
     "days": {
       "Mån": "cf5cee0e7d19bfc81abec3fbf7d77220",
       "Tis": "901e49ea998dd377884b7a34d9024418",
