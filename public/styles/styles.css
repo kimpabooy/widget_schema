@@ -185,7 +185,7 @@ button:hover {
     align-items: center;
     min-height: 100vh;
     padding: 10px;
-    gap: 10px;
+    gap: 50px;
 }
 .pair-page img {
     max-width: 49%;
