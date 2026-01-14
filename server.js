@@ -105,11 +105,11 @@ app.get('/screenshots/', (req, res, next) => {
                 const hasPair = group && group.length === 2;
 
                 // Skapa länk för enskild bild
-                let linkHtml = `<li><a href="/screenshots/view/${encodeURIComponent(file)}" target="_blank">${escapeHtml(file)}</a>`;
+                let linkHtml = `<li><a href="/screenshots/view/${encodeURIComponent(file)}?" target="_blank">${escapeHtml(file)}</a>`;
 
                 // Skapa länk för att visa båda varianter om det finns 1a och 1b
                 if (hasPair && file.includes('_1a.')) {
-                    const pairUrl = `/screenshots/view/pair/${encodeURIComponent(baseName)}`;
+                    const pairUrl = `/screenshots/view/pair/${encodeURIComponent(baseName)}?`;
                     const pairName = `${baseName}.png`;
                     linkHtml += `<a href="${pairUrl}" class="pair-link" target="_blank">${escapeHtml(pairName)}</a>`;
                 }
@@ -144,7 +144,7 @@ app.get('/screenshots/view/:filename', (req, res, next) => {
             <link rel="stylesheet" href="/styles/styles.css" />
         </head>
         <body class="single-image-page">
-            <img src="/screenshots/${encodeURIComponent(filename)}" alt="${escapeHtml(filename)}">
+            <img src="/screenshots/${encodeURIComponent(filename)}?" alt="${escapeHtml(filename)}">
         </body>
         </html>
     `;
@@ -180,8 +180,8 @@ app.get('/screenshots/view/pair/:baseName', (req, res, next) => {
             <link rel="stylesheet" href="/styles/styles.css" />
         </head>
         <body class="pair-page">
-            <img src="/screenshots/${encodeURIComponent(file1a)}" alt="${escapeHtml(file1a)}">
-            <img src="/screenshots/${encodeURIComponent(file1b)}" alt="${escapeHtml(file1b)}">
+            <img src="/screenshots/${encodeURIComponent(file1a)}?" alt="${escapeHtml(file1a)}">
+            <img src="/screenshots/${encodeURIComponent(file1b)}?" alt="${escapeHtml(file1b)}">
         </body>
         </html>
     `;
