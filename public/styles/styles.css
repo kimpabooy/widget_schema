@@ -20,6 +20,8 @@
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
     background: #fafbfc;
+    width: 1280px;
+    height: 720px;
     margin: 0;
     padding: 2em;
     color: #222;
@@ -184,10 +186,12 @@ button:hover {
     min-height: 100vh;
     padding: 40px;
     gap: 50px;
-    width: 60%;
+    width: 100%;
+    max-width: 1280px;
 }
 .pair-page img {
-    max-width: 49%;
+    max-width: calc(50% - 25px); /* 50% minus halva gapet */
+    width: 100%;
     height: auto;
 }
 
