@@ -141,7 +141,7 @@ app.get('/screenshots/view/:filename', (req, res, next) => {
             <meta charset="UTF-8">
             <title>${escapeHtml(filename)}</title>
             <link rel="icon" type="image/png" href="/images/WidgetSchemaIcon.png" />
-            <link rel="stylesheet" href="/styles/styles.css" />
+            <link rel="stylesheet" href="/styles/styles.css?v=2" />
         </head>
         <body class="single-image-page">
             <img src="/screenshots/${encodeURIComponent(filename)}?" alt="${escapeHtml(filename)}">
@@ -177,7 +177,7 @@ app.get('/screenshots/view/pair/:baseName', (req, res, next) => {
             <meta charset="UTF-8">
             <title>Schema</title>
             <link rel="icon" type="image/png" href="/images/WidgetSchemaIcon.png" />
-            <link rel="stylesheet" href="/styles/styles.css" />
+            <link rel="stylesheet" href="/styles/styles.css?v=2" />
         </head>
         <body class="pair-page">
             <img src="/screenshots/${encodeURIComponent(file1a)}?" alt="${escapeHtml(file1a)}">
