@@ -184,7 +184,7 @@ button:hover {
     justify-content: flex-start;
     align-items: flex-start;
     min-height: 100vh;
-    padding: 40px;
+    padding: 0 20px; /* 0 är top och bottom padding, 20px är left och right padding */
     gap: 50px;
     width: 100%;
     max-width: 1280px;
