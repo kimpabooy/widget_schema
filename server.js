@@ -30,7 +30,8 @@ const createError = (message, status) => {
 // allowedFrameAncestors are used to allow embedding the site in specified domains.
 const allowedFrameAncestors = [
     "'self'",
-    "https://ankaret.utvecklingfalkenberg.se"
+    "https://ankaret.utvecklingfalkenberg.se",
+    "http://localhost:8080"
 ];
 
 app.use(
