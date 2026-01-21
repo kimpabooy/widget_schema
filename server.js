@@ -189,6 +189,7 @@ app.get('/screenshots/view/pair/:baseName', (req, res, next) => {
     res.send(html);
 });
 
+
 // Statisk serving av screenshot-bilder (EFTER de specifika routerna)
 app.use('/screenshots', express.static(path.join(__dirname, 'screenshots')));
 
