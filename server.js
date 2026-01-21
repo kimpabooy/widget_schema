@@ -87,7 +87,7 @@ app.get('/screenshots/', (req, res, next) => {
                 <meta charset="UTF-8">
                 <title>Schemagalleri</title>
                 <link rel="icon" type="image/png" href="/images/WidgetSchemaIcon.png" />
-                <link rel="stylesheet" href="/styles/styles.css" />
+                <link rel="stylesheet" href="/styles/styles.css?v=${Date.now()}" />
             </head>
             <body>
                 <nav class="main-nav">
@@ -136,19 +136,19 @@ app.get('/screenshots/view/:filename', (req, res, next) => {
     }
 
     const html = `
-        <!DOCTYPE html>
-        <html lang="sv">
-        <head>
-            <meta charset="UTF-8">
-            <title>${escapeHtml(filename)}</title>
-            <link rel="icon" type="image/png" href="/images/WidgetSchemaIcon.png" />
-            <link rel="stylesheet" href="/styles/styles.css?v=2" />
-        </head>
-        <body class="single-image-page">
-            <img src="/screenshots/${encodeURIComponent(filename)}?" alt="${escapeHtml(filename)}">
-        </body>
-        </html>
-    `;
+    <!DOCTYPE html>
+    <html lang="sv">
+    <head>
+        <meta charset="UTF-8">
+        <title>${escapeHtml(filename)}</title>
+        <link rel="icon" type="image/png" href="/images/WidgetSchemaIcon.png" />
+        <link rel="stylesheet" href="/styles/styles.css?v=${Date.now()}" />
+    </head>
+    <body class="single-image-page">
+        <img src="/screenshots/${encodeURIComponent(filename)}?" alt="${escapeHtml(filename)}">
+    </body>
+    </html>
+`;
     res.send(html);
 });
 
