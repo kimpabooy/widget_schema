@@ -12,6 +12,7 @@ screenshots*
 *.log
 
 # OS
+config/rows.json
 .DS_Store
 Thumbs.db
 

@@ -8,8 +8,10 @@ services:
       - "4000:4000"
     volumes:
       - volume:/app/screenshots
+      - rowsdata:/app/config
 volumes:
   volume:
+  rowsdata:
 
 # Explanation:
 # services: Defines the services that make up the application.
