@@ -178,7 +178,7 @@ app.get('/screenshots/view/pair/:baseName', (req, res, next) => {
             <meta charset="UTF-8">
             <title>Schema</title>
             <link rel="icon" type="image/png" href="/images/WidgetSchemaIcon.png" />
-            <link rel="stylesheet" href="/styles/styles.css?v=2" />
+            <link rel="stylesheet" href="/styles/styles.css?v=${Date.now()}" />
         </head>
         <body class="pair-page">
             <img src="/screenshots/${encodeURIComponent(file1a)}?" alt="${escapeHtml(file1a)}">
@@ -188,6 +188,7 @@ app.get('/screenshots/view/pair/:baseName', (req, res, next) => {
     `;
     res.send(html);
 });
+
 
 // Statisk serving av screenshot-bilder (EFTER de specifika routerna)
 app.use('/screenshots', express.static(path.join(__dirname, 'screenshots')));
