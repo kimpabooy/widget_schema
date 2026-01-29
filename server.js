@@ -52,11 +52,13 @@ app.use(express.json());
 // Servera frontend och statiska filer
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Hjälpfunktion för att extrahera basnamn från filnamn (utan _1a/_1b suffix)
-// Matchar t.ex. "Schema_227 EP_Fre_1a.png" -> "Schema_227 EP_Fre"
+// Hjälpfunktion för att extrahera basnamn från filnamn (utan _1a/_1b suffix och utan prefix)
+// Matchar t.ex. "Schema_227 EP_Fre_1a.png" -> "227 EP_Fre"
 const getBaseSchemaName = (filename) => {
     const match = filename.match(/^(.+?)_1[ab]\.(png|jpg|jpeg)$/i);
-    return match ? match[1] : null;
+    if (!match) return null;
+    // Ta bort Schema_- eller GoogleSchema_-prefix
+    return match[1].replace(/^(Schema_|GoogleSchema_)/, '');
 };
 
 // --- Routes för Screenshots-galleriet --- //
@@ -71,13 +73,25 @@ app.get('/screenshots/', (req, res, next) => {
 
         const imageFiles = files.filter(f => /\.(png|jpg|jpeg)$/i.test(f)).sort();
 
-        // Gruppera bilder efter basnamn
+        // Gruppera bilder efter basnamn och hantera GoogleSchema separat
+        // Spara även originalt baseName med prefix för rätt länkning
         const groups = {};
+        const baseNameWithPrefixMap = {};
+        const googleSchemas = [];
         imageFiles.forEach(file => {
+            if (file.startsWith('GoogleSchema_')) {
+                googleSchemas.push(file);
+                return;
+            }
+            // Hämta baseName utan prefix
             const baseName = getBaseSchemaName(file);
-            if (baseName) {
+            // Hämta baseName MED prefix (för länkning)
+            const match = file.match(/^(.+)_1[ab]\.(png|jpg|jpeg)$/i);
+            const baseNameWithPrefix = match ? match[1] : null;
+            if (baseName && baseNameWithPrefix) {
                 if (!groups[baseName]) groups[baseName] = [];
                 groups[baseName].push(file);
+                baseNameWithPrefixMap[baseName] = baseNameWithPrefix;
             }
         });
 
@@ -95,31 +109,41 @@ app.get('/screenshots/', (req, res, next) => {
                     <a href="/" class="nav-link">Schemahantering</a>
                     <a href="/screenshots/" class="nav-link active">Schemagalleri</a>
                 </nav>
+                <h1 style="text-align:center; margin-bottom:0.5em;">Schemagalleri</h1>
         `;
 
         if (!Array.isArray(imageFiles) || imageFiles.length === 0) {
             html += '<h2>Inga bilder hittades.</h2>';
         } else {
-            // Skapa listan med länkar
-            const links = imageFiles.map(file => {
-                const baseName = getBaseSchemaName(file);
-                const group = baseName ? groups[baseName] : null;
-                const hasPair = group && group.length === 2;
-
-                // Skapa länk för enskild bild
-                let linkHtml = `<li><a href="/screenshots/view/${encodeURIComponent(file)}?" target="_blank">${escapeHtml(file)}</a>`;
-
-                // Skapa länk för att visa båda varianter om det finns 1a och 1b
-                if (hasPair && file.includes('_1a.')) {
-                    const pairUrl = `/screenshots/view/pair/${encodeURIComponent(baseName)}?`;
-                    const pairName = `${baseName}.png`;
-                    linkHtml += `<a href="${pairUrl}" class="pair-link" target="_blank">${escapeHtml(pairName)}</a>`;
+            html += `<div class="gallery-grid">`;
+            // Visa vanliga grupperade scheman
+            Object.entries(groups).forEach(([baseName, files]) => {
+                html += `<div class="gallery-card">`;
+                html += `<div class="gallery-card-title">${escapeHtml(baseName)}</div>`;
+                html += `<div class="gallery-card-images">`;
+                files.forEach(f => {
+                    html += `<a href="/screenshots/view/${encodeURIComponent(f)}?" target="_blank"><img src="/screenshots/${encodeURIComponent(f)}?thumb=1" alt="${escapeHtml(f)}" class="gallery-img"></a>`;
+                });
+                html += `</div>`;
+                if (files.length === 2) {
+                    // Använd baseName med prefix i länken
+                    const baseNameWithPrefix = baseNameWithPrefixMap[baseName] || baseName;
+                    html += `<div class="gallery-card-links"><a href="/screenshots/view/pair/${encodeURIComponent(baseNameWithPrefix)}?" target="_blank">Länk till Schemat</a></div>`;
                 }
-
-                linkHtml += `</li>`;
-                return linkHtml;
-            }).join('');
-            html += `<ul>${links}</ul>`;
+                html += `</div>`;
+            });
+            // Visa GoogleSchema-bilder som egna kort, med filnamnet som rubrik (utan prefix)
+            googleSchemas.forEach(f => {
+                let title = f.replace(/\.(png|jpg|jpeg)$/i, '').replace(/^(Schema_|GoogleSchema_)/, '');
+                html += `<div class="gallery-card">`;
+                html += `<div class="gallery-card-title">${escapeHtml(title)}</div>`;
+                html += `<div class="gallery-card-images">`;
+                html += `<a href="/screenshots/view/${encodeURIComponent(f)}?" target="_blank"><img src="/screenshots/${encodeURIComponent(f)}?thumb=1" alt="${escapeHtml(f)}" class="gallery-img"></a>`;
+                html += `</div>`;
+                html += `<div class="gallery-card-links"><a href="/screenshots/view/${encodeURIComponent(f)}?" target="_blank">Länk till Schemat</a></div>`;
+                html += `</div>`;
+            });
+            html += `</div>`;
         }
         html += `</body></html>`;
         res.send(html);
@@ -139,17 +163,19 @@ app.get('/screenshots/view/:filename', (req, res, next) => {
     // Om det är en Google Slides-bild, använd särskild klass
     const isGoogleSlide = filename.startsWith('GoogleSchema_');
     const pageClass = isGoogleSlide ? 'google-slide-image-page' : 'single-image-page';
+    // Ta bort prefix för visningstitel
+    let displayTitle = filename.replace(/\.(png|jpg|jpeg)$/i, '').replace(/^(Schema_|GoogleSchema_)/, '');
     const html = `
     <!DOCTYPE html>
     <html lang="sv">
     <head>
         <meta charset="UTF-8">
-        <title>${escapeHtml(filename)}</title>
+        <title>${escapeHtml(displayTitle)}</title>
         <link rel="icon" type="image/png" href="/images/WidgetSchemaIcon.png" />
         <link rel="stylesheet" href="/styles/styles.css?v=${Date.now()}" />
     </head>
     <body class="${pageClass}">
-        <img src="/screenshots/${encodeURIComponent(filename)}?" alt="${escapeHtml(filename)}">
+        <img src="/screenshots/${encodeURIComponent(filename)}?" alt="${escapeHtml(displayTitle)}">
     </body>
     </html>
 `;
