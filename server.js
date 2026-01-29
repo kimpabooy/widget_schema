@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const { processAll } = require('./src/processor');
 const settings = require('./config/settings.json');
 const express = require('express');
@@ -33,7 +35,6 @@ const allowedFrameAncestors = [
     "https://ankaret.utvecklingfalkenberg.se",
     "http://localhost:8080"
 ];
-
 app.use(
     helmet({
         contentSecurityPolicy: {
@@ -135,6 +136,9 @@ app.get('/screenshots/view/:filename', (req, res, next) => {
         return next(createError('Bilden hittades inte.', 404));
     }
 
+    // Om det är en Google Slides-bild, använd särskild klass
+    const isGoogleSlide = filename.startsWith('GoogleSchema_');
+    const pageClass = isGoogleSlide ? 'google-slide-image-page' : 'single-image-page';
     const html = `
     <!DOCTYPE html>
     <html lang="sv">
@@ -144,7 +148,7 @@ app.get('/screenshots/view/:filename', (req, res, next) => {
         <link rel="icon" type="image/png" href="/images/WidgetSchemaIcon.png" />
         <link rel="stylesheet" href="/styles/styles.css?v=${Date.now()}" />
     </head>
-    <body class="single-image-page">
+    <body class="${pageClass}">
         <img src="/screenshots/${encodeURIComponent(filename)}?" alt="${escapeHtml(filename)}">
     </body>
     </html>
@@ -219,19 +223,20 @@ app.post('/api/schemas', (req, res, next) => {
         }
     }
 
-    let { name, days } = req.body;
+    let { name, type, days } = req.body;
     if (!name || typeof name !== 'string' || !days || typeof days !== 'object') {
         return next(createError('Felaktig data.', 400));
     }
 
     // Trimma och ersätt mellanslag med understreck
     name = name.trim().replace(/ +/g, "_");
+    type = typeof type === 'string' ? type : 'widgit';
 
     if (data.some(r => r.name === name)) {
         return next(createError('Schema med detta namn finns redan.', 409));
     }
 
-    data.push({ name, days });
+    data.push({ name, type, days });
     fs.writeFileSync(SCHEMAS_PATH, JSON.stringify(data, null, 2), 'utf8');
     res.status(201).json({ success: true });
 });
@@ -313,6 +318,7 @@ app.use((err, req, res, next) => {
     }
 });
 
-app.listen(settings.port, () => {
-    console.log(`Server körs på http://localhost:${settings.port}/`);
+const port = process.env.PORT;
+app.listen(port, () => {
+    console.log(`Server körs på http://localhost:${port}/`);
 });
