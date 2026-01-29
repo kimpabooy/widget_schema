@@ -151,6 +151,7 @@ async function fetchSchemas() {
 document.getElementById('add-form').onsubmit = async e => {
     e.preventDefault();
     const name = document.getElementById('name').value.trim();
+    const type = document.getElementById('type').value;
     if (!name) {
         alert('Du måste ange ett namn för schemat.');
         return;
@@ -168,7 +169,7 @@ document.getElementById('add-form').onsubmit = async e => {
         const res = await fetch('/api/schemas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, days: daysObj })
+            body: JSON.stringify({ name, type, days: daysObj })
         });
         if (res.status === 409) {
             alert('Ett schema med detta namn finns redan.');

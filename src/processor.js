@@ -1,4 +1,5 @@
-const { scrapeSingleWidgitPage } = require('./scraper');
+require('dotenv').config();
+const { scrapeWidgitPage, scrapeGoogleSlidesPage } = require('./scraper');
 const fs = require('fs');
 const path = require('path');
 
@@ -6,7 +7,8 @@ const path = require('path');
 const getRows = () => JSON.parse(fs.readFileSync(path.join(__dirname, '../config/rows.json'), 'utf8'));
 const getSettings = () => JSON.parse(fs.readFileSync(path.join(__dirname, '../config/settings.json'), 'utf8'));
 
-const baseUrl = "https://widgitonline.com/doc/";
+const baseWidgetUrl = process.env.WIDGIT_BASE_URL;
+const baseGoogleSlideUrl = process.env.GOOGLE_SLIDES_BASE_URL;
 
 // Rensar bort bilder som inte längre har ett motsvarande schema
 function cleanupOldImages(rows, settings) {
@@ -14,12 +16,13 @@ function cleanupOldImages(rows, settings) {
 
     // Kontrollera om mappen finns
     if (!fs.existsSync(outputDir)) {
-        return; // Inga bilder att rensa
+        return;
     }
 
     // Skapa en lista med alla förväntade filnamn baserat på rows.json filen
     const expectedFiles = new Set();
-    for (const row of rows) {
+    // Widgit-scheman
+    for (const row of rows.filter(r => !r.type || r.type === 'widgit')) {
         for (const day of Object.keys(row.days)) {
             for (const variant of settings.variants) {
                 const filename = settings.baseFilename
@@ -28,6 +31,15 @@ function cleanupOldImages(rows, settings) {
                     .replace('{variant}', variant);
                 expectedFiles.add(filename);
             }
+        }
+    }
+    // Google Slides-scheman
+    for (const row of rows.filter(r => r.type === 'googleslides')) {
+        for (const day of Object.keys(row.days)) {
+            const filename = settings.baseFileNameGoogleSlides
+                .replace('{row}', row.name)
+                .replace('{day}', day);
+            expectedFiles.add(filename);
         }
     }
 
@@ -48,7 +60,7 @@ function cleanupOldImages(rows, settings) {
     }
 }
 
-// Main function for processing all schemas
+// Huvudfunktion för att processa alla scheman
 async function processAll() {
     console.log("Startar Schemagenerering...");
 
@@ -59,23 +71,23 @@ async function processAll() {
     // Rensa bort bilder från borttagna scheman
     cleanupOldImages(rows, settings);
 
-    // Loop through each row and day to scrape and save images
-    for (const row of rows) {
-        for (const [day, docId] of Object.entries(row.days)) { // day is key, docId is value, row.days = {"Mån": "docId1", "Tis": "docId2", ...and so on}
+    // Loopa igenom varje rad och dag för att skrapa och spara bilder
+    for (const row of rows.filter(r => !r.type || r.type === 'widgit')) {
+        for (const [day, docId] of Object.entries(row.days)) { // { "Mån": "docId1", "Tis": "docId2", ... }
             try {
-                const url = baseUrl + docId; // Construct the full URL
+                const url = baseWidgetUrl + docId; // Bygg URL från miljövariabel
                 console.log(`Hämtar ${row.name} - ${day}`);
 
-                // Generate filenames for each variant
+                // Genererar filnamn för varje variant
                 let filenames = [];
                 for (let i = 0; i < settings.variants.length; i++) {
-                    const variant = settings.variants[i]; // e.g., "1a", "1b", etc.  if needed more variants, adjust config file
-                    const filename = generateFilename(row.name, day, variant, settings); // e.g., "Schema_{RowName}_{Day}_{Variant}.png"
+                    const variant = settings.variants[i];
+                    const filename = generateFilename(row.name, day, variant, settings);
                     filenames.push(filename);
                 }
 
-                // Scrape the page and save images
-                const images = await scrapeSingleWidgitPage(url, filenames, settings.outputDir);
+                // Skrapa sidan och spara bilderna
+                const images = await scrapeWidgitPage(url, filenames, settings.outputDir);
                 for (const img of images) {
                     console.log(`Sparade bild till: ${settings.outputDir}/${img}`);
                 }
@@ -85,7 +97,40 @@ async function processAll() {
             }
         }
     }
-    console.log("Alla Scheman är hämtade!");
+    await processAllGoogleSlides();
+
+    console.log("\nAlla Scheman är hämtade!");
+}
+
+async function processAllGoogleSlides() {
+    console.log("Startar Google Slides-schemagenerering...");
+
+    const rows = getRows();
+    const settings = getSettings();
+
+    for (const row of rows.filter(r => r.type === 'googleslides')) {
+        for (const [day, docId] of Object.entries(row.days)) {
+            try {
+                // Bygg filnamnet enligt settings.json
+                const filename = settings.baseFileNameGoogleSlides
+                    .replace('{row}', row.name)
+                    .replace('{day}', day);
+
+                // Bygg Google Slides-URL från miljövariabel
+                const url = baseGoogleSlideUrl + docId;
+                console.log(`Hämtar ${row.name} - ${day}`);
+
+                // Kör scrapern
+                const images = await scrapeGoogleSlidesPage(url, filename, settings.outputDir);
+                for (const img of images) {
+                    console.log(`Sparade bild till: ${settings.outputDir}/${img}`);
+                }
+            } catch (error) {
+                console.error(`Fel vid hämtning av Google Slides för ${row.name} - ${day}:`, error.message);
+            }
+        }
+    }
+    console.log("Alla Google Slides-scheman är hämtade!");
 }
 
 // Helper function to generate filenames based on the template in settings.json
