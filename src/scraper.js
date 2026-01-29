@@ -1,9 +1,9 @@
 const { chromium } = require('playwright');
 
-// Huvudfunktion för att skrapa Schema
-async function scrapeSingleWidgitPage(url, filenames, outputDir) {
+// --- Huvudfunktion för att skrapa Schema Widgit-sida ---
+async function scrapeWidgitPage(url, filenames, outputDir) {
     const browser = await chromium.launch();
-    // const browser = await chromium.launch({ headless: false });
+    // const browser = await chromium.launch({ headless: false, slowMo: 3000 }); // Debugging mode
 
     try {
         const context = await browser.newContext();
@@ -53,7 +53,7 @@ async function scrapeSingleWidgitPage(url, filenames, outputDir) {
     }
 }
 
-// Help function to scrape the page and find the grid element
+// --- Help function to scrape the page and find the grid element ---
 async function findGridElement(inner) {
     const children = await inner.$$('div');
     let maxChild = null;
@@ -69,4 +69,36 @@ async function findGridElement(inner) {
     return maxChild;
 }
 
-module.exports = { scrapeSingleWidgitPage };
+// --- Skrapa Google Slides ---
+async function scrapeGoogleSlidesPage(url, filename, outputDir) {
+    const browser = await chromium.launch();
+    // const browser = await chromium.launch({ headless: false, slowMo: 1000 }); // Debugging mode
+    try {
+        const context = await browser.newContext();
+        const page = await context.newPage();
+        let screenshotPaths = [];
+
+        await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+
+        // Vänta på SVG-elementet
+        const svg = await page.waitForSelector('.sketchyViewerContent svg');
+        if (!svg) throw new Error('SVG-elementet hittades inte!');
+
+        // Hämta bounding box för SVG-elementet
+        const svgArea = await svg.boundingBox();
+        if (!svgArea) throw new Error('Kunde inte hämta bounding box för SVG!');
+
+        // Ta screenshot av endast SVG-området
+        await page.screenshot({
+            path: `${outputDir}/${filename}`,
+            clip: svgArea
+        });
+        screenshotPaths.push(filename);
+
+        return screenshotPaths;
+    } finally {
+        await browser.close();
+    }
+}
+
+module.exports = { scrapeWidgitPage, scrapeGoogleSlidesPage };
