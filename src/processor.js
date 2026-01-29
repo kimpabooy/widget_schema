@@ -72,7 +72,7 @@ async function processAll() {
     cleanupOldImages(rows, settings);
 
     // Loopa igenom varje rad och dag för att skrapa och spara bilder
-    for (const row of rows) {
+    for (const row of rows.filter(r => !r.type || r.type === 'widgit')) {
         for (const [day, docId] of Object.entries(row.days)) { // { "Mån": "docId1", "Tis": "docId2", ... }
             try {
                 const url = baseWidgetUrl + docId; // Bygg URL från miljövariabel
@@ -118,6 +118,7 @@ async function processAllGoogleSlides() {
 
                 // Bygg Google Slides-URL från miljövariabel
                 const url = baseGoogleSlideUrl + docId;
+                console.log(`Hämtar ${row.name} - ${day}`);
 
                 // Kör scrapern
                 const images = await scrapeGoogleSlidesPage(url, filename, settings.outputDir);
