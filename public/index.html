@@ -23,6 +23,12 @@
             <h2>Lägg till nytt Schema</h2>
             <form id="add-form">
                 <label>Namn: <input type="text" id="name" required></label>
+                <label for="type">Typ av Schema:
+                    <select id="type" name="type" required>
+                        <option value="widgit">WidgitOnline</option>
+                        <option value="googleslides">Google Slides</option>
+                    </select>
+                </label>
                 <div id="days-inputs"></div>
                 <button type="submit">Lägg till</button>
             </form>
