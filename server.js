@@ -344,7 +344,7 @@ app.use((err, req, res, next) => {
     }
 });
 
-const port = process.env.PORT;
+const port = process.env.PORT || settings.port || 4000;
 app.listen(port, () => {
     console.log(`Server körs på http://localhost:${port}/`);
 });
