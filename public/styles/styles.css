@@ -348,6 +348,7 @@ button:hover, .schema-form-container button:hover, #update-btn-container button:
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
+    overflow: hidden;
     /* min-height: 100vh; */
 }
 .google-slide-image-page img {
