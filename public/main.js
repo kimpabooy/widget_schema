@@ -116,7 +116,7 @@ function renderSchemaList(schemas) {
         let html = `<div class="schema-title"><b>${idx + 1}. Namn: ${schema.name}</b></div>`;
         html += '<ul class="schema-days-ul">';
         for (const [day, docId] of Object.entries(schema.days)) {
-            html += `<li>DokumentID för ${day}: <span class="schema-docid">${docId}</span></li>`;
+            html += `<li><b>${day}:</b> <span class="schema-docid">${docId}</span></li>`;
         }
         html += '</ul>';
         li.innerHTML = html;
