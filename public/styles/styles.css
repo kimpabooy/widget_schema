@@ -36,9 +36,9 @@ body {
     to { opacity: 1; transform: none;}
 }
 .gallery-card {
-    background: #fff;
+    background: #ffffff;
     border-radius: 16px;
-    box-shadow: 0 2px 16px 0 #0001;
+    box-shadow: 0 2px 16px 2px #0001;
     padding: 1.5em 1.2em 1.2em 1.2em;
     display: flex;
     flex-direction: column;
@@ -78,7 +78,7 @@ body {
     cursor: pointer;
 }
 .gallery-img:hover {
-    transform: scale(1.10) rotate(-2deg);
+    transform: scale(1.20) rotate(-2deg);
     box-shadow: 0 4px 18px #4a148c22;
 }
 .gallery-card-links {
@@ -104,16 +104,7 @@ body {
     box-shadow: 0 2px 10px #4a148c33;
     text-decoration: none;
 }
-.gallery-card::after {
-    content: "★";
-    color: #e1bee7;
-    font-size: 2.2em;
-    position: absolute;
-    top: -18px;
-    right: -18px;
-    opacity: 0.13;
-    pointer-events: none;
-}
+
 /* Flex container for form and schema list */
 .schema-flex-container {
     display: flex;
@@ -129,15 +120,16 @@ body {
 }
 
 .schema-list {
-    flex: 1 1 0;
+    /* flex: 1 1 0;
     min-width: 350px;
-    max-width: 700px;
+    max-width: 700px; */
+    margin-bottom: 2em;
 }
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
     background: #fafbfc;
-    width: 1280px;
-    height: 720px;
+    /* width: 1280px; */
+    /* height: 720px; */
     margin: 0;
     padding: 2em;
     color: #222;
@@ -162,9 +154,6 @@ h2 {
     margin-top: 2em;
     color: #333;
 }
-.schema-list {
-    margin-bottom: 2em;
-}
 .schema-item {
     margin-bottom: 0.5em;
     padding: 0.3em 0;
@@ -178,7 +167,7 @@ form {
     background: #fff;
     padding: 1em 1.5em 1.5em 1.5em;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     max-width: 350px;
 }
 label {
@@ -221,9 +210,16 @@ button:hover, .schema-form-container button:hover, #update-btn-container button:
     margin-left: 1em;
     font-weight: 600;
     font-size: 0.98em;
+    border: 1px solid #d32f2f;
+    border-radius: 4px;
+    padding: 0.2em 0.5em;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
 }
 .delete-btn:hover {
     text-decoration: underline;
+    background: #d32f2f;
+    color: #fff;
+    box-shadow: 0 2px 10px #d32f2f33;
 }
 
 /* Navigation styling */
@@ -251,9 +247,11 @@ button:hover, .schema-form-container button:hover, #update-btn-container button:
     color: #1a237e;
 }
 .schema-list-ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.2em;
     padding: 0;
     margin: 0;
-    max-width: 700px;
     list-style: none;
 }
 .schema-list-li {
@@ -264,6 +262,8 @@ button:hover, .schema-form-container button:hover, #update-btn-container button:
     padding: 1em 1.5em 1em 1.5em;
     position: relative;
     list-style: none;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 .schema-title {
     font-size: 1.1em;
@@ -276,6 +276,7 @@ button:hover, .schema-form-container button:hover, #update-btn-container button:
     padding: 0;
     color: #333;
     font-size: 0.98em;
+    list-style: none;
 }
 .schema-docid {
     font-family: monospace;
@@ -286,6 +287,8 @@ button:hover, .schema-form-container button:hover, #update-btn-container button:
     position: absolute;
     top: 1em;
     right: 1.5em;
+    border: 1px solid #d32f2f;
+    padding: 0.2em 0.5em;
 }
 
 /* Schemagalleri - pair link */
@@ -345,14 +348,24 @@ button:hover, .schema-form-container button:hover, #update-btn-container button:
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
-    min-height: 100vh;
+    /* min-height: 100vh; */
 }
 .google-slide-image-page img {
-    max-width: 1280px;
-    max-height: 1080px;
-    width: 100%;
-    /* height: 100%; */
+    height: auto;
+    width: 95%;
+    max-height: 80vh;
+    display: block;
+    /* margin: 0 auto; */
+    /* object-fit: contain; */
+}
+
+
+.BACKUPgoogle-slide-image-page img {
+    height: 95%;
+    width: 95%;
+    /* max-width: 100vw; */
+    /* max-height: 1000px; */
     display: block;
     margin: 0;
-    object-fit: contain;
+    /* object-fit: contain; */
 }
