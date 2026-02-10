@@ -310,12 +310,12 @@ button:hover, .schema-form-container button:hover, #update-btn-container button:
     align-items: flex-start;
     min-height: 100vh;
     padding: 0 20px; /* 0 är top och bottom padding, 20px är left och right padding */
-    gap: 50px;
+    gap: 75px;
     width: 100%;
-    max-width: 1280px;
+    min-width: 1280px;
 }
 .pair-page img {
-    max-width: calc(50% - 25px); /* 50% minus halva gapet */
+    max-width: calc(50% - 37.5px); /* calc(50% minus half the gap) */
     width: 100%;
     height: auto;
 }
