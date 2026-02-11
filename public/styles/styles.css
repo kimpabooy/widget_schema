@@ -301,24 +301,45 @@ button:hover, .schema-form-container button:hover, #update-btn-container button:
     text-decoration: underline;
 }
 
-/* Pair-sida - visar två bilder bredvid varandra */
+
 .pair-page {
     box-sizing: border-box;
     background: #fff;
     display: flex;
     justify-content: flex-start;
     align-items: flex-start;
-    min-height: 100vh;
+    padding: 0 20px;
+    width: 1280px; /* Fast bredd för 4K */
+    height: 720px; /* Fast höjd för 4K */
+}
+
+.pair-page img {
+    margin-right: 60px !important; /* VIKTIGT: !important för att överskriva andra regler */
+    width: calc(50% - 30px); /* "calc" räknar ut bredden baserat på tillgängligt utrymme minus marginal */
+    max-width: calc(50% - 30px);
+    height: auto;
+}
+
+/* Pair-sida - visar två bilder bredvid varandra */
+
+.BACKUP_pair-page {
+    box-sizing: border-box;
+    background: #fff;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    /* min-height: 100vh; */
     padding: 0 20px; /* 0 är top och bottom padding, 20px är left och right padding */
-    gap: 75px;
+    gap: 50px;
     width: 100%;
     min-width: 1280px;
 }
-.pair-page img {
-    max-width: calc(50% - 37.5px); /* calc(50% minus half the gap) */
+.BACKUP_pair-page img {
+    max-width: calc(50% - 25px); /* calc(50% minus half the gap) */
     width: 100%;
     height: auto;
 }
+
 
 /* Enskild bild-sida */
 .single-image-page {
@@ -361,7 +382,7 @@ button:hover, .schema-form-container button:hover, #update-btn-container button:
 }
 
 
-.BACKUPgoogle-slide-image-page img {
+.BACKUP_google-slide-image-page img {
     height: 95%;
     width: 95%;
     /* max-width: 100vw; */
@@ -370,3 +391,13 @@ button:hover, .schema-form-container button:hover, #update-btn-container button:
     margin: 0;
     /* object-fit: contain; */
 }
+
+/* 
+
+
+
+
+
+
+
+*/
