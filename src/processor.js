@@ -61,7 +61,7 @@ function cleanupOldImages(rows, settings) {
 }
 
 // GBegränsning för samtidiga Playwright-processer
-const MAX_CONCURRENT = 2;
+const MAX_CONCURRENT = 5;
 
 // Global runQueue-funktion för parallell kö
 async function runQueue(tasks, maxConcurrent) {
