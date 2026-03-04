@@ -60,6 +60,37 @@ function cleanupOldImages(rows, settings) {
     }
 }
 
+// GBegränsning för samtidiga Playwright-processer
+const MAX_CONCURRENT = 2;
+
+// Global runQueue-funktion för parallell kö
+async function runQueue(tasks, maxConcurrent) {
+    let index = 0;
+    let running = 0;
+    return new Promise((resolve, reject) => {
+        let finished = 0;
+        function next() {
+            while (running < maxConcurrent && index < tasks.length) {
+                running++;
+                const task = tasks[index++]();
+                task.then(() => {
+                    running--;
+                    finished++;
+                    if (finished === tasks.length) resolve();
+                    else next();
+                }).catch(err => {
+                    running--;
+                    finished++;
+                    console.error('Task error:', err);
+                    if (finished === tasks.length) resolve();
+                    else next();
+                });
+            }
+        }
+        next();
+    });
+}
+
 // Huvudfunktion för att processa alla scheman
 async function processAll() {
     console.log("Startar Schemagenerering...");
@@ -71,32 +102,32 @@ async function processAll() {
     // Rensa bort bilder från borttagna scheman
     cleanupOldImages(rows, settings);
 
-    // Loopa igenom varje rad och dag för att skrapa och spara bilder
+    // Parallell skrapning med begränsad samtidighet
+    const tasks = [];
     for (const row of rows.filter(r => !r.type || r.type === 'widgit')) {
-        for (const [day, docId] of Object.entries(row.days)) { // { "Mån": "docId1", "Tis": "docId2", ... }
-            try {
-                const url = baseWidgetUrl + docId; // Bygg URL från miljövariabel
-                console.log(`Hämtar ${row.name} - ${day}`);
-
-                // Genererar filnamn för varje variant
-                let filenames = [];
-                for (let i = 0; i < settings.variants.length; i++) {
-                    const variant = settings.variants[i];
-                    const filename = generateFilename(row.name, day, variant, settings);
-                    filenames.push(filename);
+        for (const [day, docId] of Object.entries(row.days)) {
+            tasks.push(async () => {
+                try {
+                    const url = baseWidgetUrl + docId;
+                    console.log(`Hämtar ${row.name} - ${day}`);
+                    let filenames = [];
+                    for (let i = 0; i < settings.variants.length; i++) {
+                        const variant = settings.variants[i];
+                        const filename = generateFilename(row.name, day, variant, settings);
+                        filenames.push(filename);
+                    }
+                    const images = await scrapeWidgitPage(url, filenames, settings.outputDir);
+                    for (const img of images) {
+                        console.log(`Sparade bild till: ${settings.outputDir}/${img}`);
+                    }
+                } catch (error) {
+                    console.error(`Fel vid hämtning av ${row.name} - ${day}:`, error.message);
                 }
-
-                // Skrapa sidan och spara bilderna
-                const images = await scrapeWidgitPage(url, filenames, settings.outputDir);
-                for (const img of images) {
-                    console.log(`Sparade bild till: ${settings.outputDir}/${img}`);
-                }
-            } catch (error) {
-                console.error(`Fel vid hämtning av ${row.name} - ${day}:`, error.message);
-                // Fortsätter till nästa schema istället för att avbryta
-            }
+            });
         }
     }
+
+    await runQueue(tasks, MAX_CONCURRENT);
     await processAllGoogleSlides();
 
     console.log("\nAlla Scheman är hämtade!");
@@ -108,28 +139,29 @@ async function processAllGoogleSlides() {
     const rows = getRows();
     const settings = getSettings();
 
+    // Parallell skrapning med begränsad samtidighet
+    const tasks = [];
     for (const row of rows.filter(r => r.type === 'googleslides')) {
         for (const [day, docId] of Object.entries(row.days)) {
-            try {
-                // Bygg filnamnet enligt settings.json
-                const filename = settings.baseFileNameGoogleSlides
-                    .replace('{row}', row.name)
-                    .replace('{day}', day);
-
-                // Bygg Google Slides-URL från miljövariabel
-                const url = baseGoogleSlideUrl + docId;
-                console.log(`Hämtar ${row.name} - ${day}`);
-
-                // Kör scrapern
-                const images = await scrapeGoogleSlidesPage(url, filename, settings.outputDir);
-                for (const img of images) {
-                    console.log(`Sparade bild till: ${settings.outputDir}/${img}`);
+            tasks.push(async () => {
+                try {
+                    const filename = settings.baseFileNameGoogleSlides
+                        .replace('{row}', row.name)
+                        .replace('{day}', day);
+                    const url = baseGoogleSlideUrl + docId;
+                    console.log(`Hämtar ${row.name} - ${day}`);
+                    const images = await scrapeGoogleSlidesPage(url, filename, settings.outputDir);
+                    for (const img of images) {
+                        console.log(`Sparade bild till: ${settings.outputDir}/${img}`);
+                    }
+                } catch (error) {
+                    console.error(`Fel vid hämtning av Google Slides för ${row.name} - ${day}:`, error.message);
                 }
-            } catch (error) {
-                console.error(`Fel vid hämtning av Google Slides för ${row.name} - ${day}:`, error.message);
-            }
+            });
         }
     }
+
+    await runQueue(tasks, MAX_CONCURRENT);
     console.log("Alla Google Slides-scheman är hämtade!");
 }
 
@@ -141,8 +173,6 @@ function generateFilename(row, day, variant, settings) {
         .replace('{variant}', variant);
 }
 
-// module.exports = { processAll };
-
 // Funktion för att processa ett enskilt schema
 async function processSingle(name) {
     console.log(`Startar omklippning av schema: ${name}`);
@@ -152,44 +182,52 @@ async function processSingle(name) {
     if (!row) {
         throw new Error(`Schema med namn '${name}' hittades inte.`);
     }
-    // Widgit-schema
+    // Widgit-schema parallellt
+    const widgitTasks = [];
     if (!row.type || row.type === 'widgit') {
         for (const [day, docId] of Object.entries(row.days)) {
-            try {
-                const url = baseWidgetUrl + docId;
-                console.log(`Hämtar ${row.name} - ${day}`);
-                let filenames = [];
-                for (let i = 0; i < settings.variants.length; i++) {
-                    const variant = settings.variants[i];
-                    const filename = generateFilename(row.name, day, variant, settings);
-                    filenames.push(filename);
+            widgitTasks.push(async () => {
+                try {
+                    const url = baseWidgetUrl + docId;
+                    console.log(`Hämtar ${row.name} - ${day}`);
+                    let filenames = [];
+                    for (let i = 0; i < settings.variants.length; i++) {
+                        const variant = settings.variants[i];
+                        const filename = generateFilename(row.name, day, variant, settings);
+                        filenames.push(filename);
+                    }
+                    const images = await scrapeWidgitPage(url, filenames, settings.outputDir);
+                    for (const img of images) {
+                        console.log(`Sparade bild till: ${settings.outputDir}/${img}`);
+                    }
+                } catch (error) {
+                    console.error(`Fel vid hämtning av ${row.name} - ${day}:`, error.message);
                 }
-                const images = await scrapeWidgitPage(url, filenames, settings.outputDir);
-                for (const img of images) {
-                    console.log(`Sparade bild till: ${settings.outputDir}/${img}`);
-                }
-            } catch (error) {
-                console.error(`Fel vid hämtning av ${row.name} - ${day}:`, error.message);
-            }
+            });
         }
+        await runQueue(widgitTasks, MAX_CONCURRENT);
     }
-    // Google Slides-schema
+    // Google Slides-schema parallellt
+    const slidesTasks = [];
     if (row.type === 'googleslides') {
         for (const [day, docId] of Object.entries(row.days)) {
-            try {
-                const filename = settings.baseFileNameGoogleSlides
-                    .replace('{row}', row.name)
-                    .replace('{day}', day);
-                const url = baseGoogleSlideUrl + docId;
-                console.log(`Hämtar ${row.name} - ${day}`);
-                const images = await scrapeGoogleSlidesPage(url, filename, settings.outputDir);
-                for (const img of images) {
-                    console.log(`Sparade bild till: ${settings.outputDir}/${img}`);
+            slidesTasks.push(async () => {
+                try {
+                    const filename = settings.baseFileNameGoogleSlides
+                        .replace('{row}', row.name)
+                        .replace('{day}', day);
+                    const url = baseGoogleSlideUrl + docId;
+                    console.log(`Hämtar ${row.name} - ${day}`);
+                    const images = await scrapeGoogleSlidesPage(url, filename, settings.outputDir);
+                    for (const img of images) {
+                        console.log(`Sparade bild till: ${settings.outputDir}/${img}`);
+                    }
+                } catch (error) {
+                    console.error(`Fel vid hämtning av Google Slides för ${row.name} - ${day}:`, error.message);
                 }
-            } catch (error) {
-                console.error(`Fel vid hämtning av Google Slides för ${row.name} - ${day}:`, error.message);
-            }
+            });
         }
+        await runQueue(slidesTasks, MAX_CONCURRENT);
     }
     console.log(`Schema '${name}' är hämtat!`);
 }
