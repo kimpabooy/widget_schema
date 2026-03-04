@@ -1,6 +1,5 @@
 require('dotenv').config();
-
-const { processAll } = require('./src/processor');
+const { processAll, processSingle } = require('./src/processor');
 const settings = require('./config/settings.json');
 const express = require('express');
 const helmet = require('helmet');
@@ -292,7 +291,7 @@ app.delete('/api/schemas/:name', (req, res, next) => {
     res.json({ success: true });
 });
 
-// POST: Hämta om alla scheman genom /api/update
+
 app.post('/api/update', async (req, res, next) => {
     // Förhindra flera samtidiga uppdateringar
     if (updateStatus.isUpdating) {
@@ -307,6 +306,26 @@ app.post('/api/update', async (req, res, next) => {
         updateStatus.isUpdating = false;
         updateStatus.startTime = null;
         res.json({ success: true, message: 'Alla Scheman har hämtats om.' });
+    } catch (err) {
+        updateStatus.isUpdating = false;
+        updateStatus.startTime = null;
+        next(createError(err.message, 500));
+    }
+});
+
+// POST: Hämta om ett enskilt schema genom /api/update/:name
+app.post('/api/update/:name', async (req, res, next) => {
+    const name = req.params.name;
+    if (updateStatus.isUpdating) {
+        return res.json({ success: false, message: 'Uppdatering pågår redan.' });
+    }
+    updateStatus.isUpdating = true;
+    updateStatus.startTime = Date.now();
+    try {
+        await processSingle(name);
+        updateStatus.isUpdating = false;
+        updateStatus.startTime = null;
+        res.json({ success: true, message: `Schemat '${name}' har hämtats om.` });
     } catch (err) {
         updateStatus.isUpdating = false;
         updateStatus.startTime = null;
