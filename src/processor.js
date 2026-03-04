@@ -141,4 +141,57 @@ function generateFilename(row, day, variant, settings) {
         .replace('{variant}', variant);
 }
 
-module.exports = { processAll };
+// module.exports = { processAll };
+
+// Funktion för att processa ett enskilt schema
+async function processSingle(name) {
+    console.log(`Startar omklippning av schema: ${name}`);
+    const rows = getRows();
+    const settings = getSettings();
+    const row = rows.find(r => r.name === name);
+    if (!row) {
+        throw new Error(`Schema med namn '${name}' hittades inte.`);
+    }
+    // Widgit-schema
+    if (!row.type || row.type === 'widgit') {
+        for (const [day, docId] of Object.entries(row.days)) {
+            try {
+                const url = baseWidgetUrl + docId;
+                console.log(`Hämtar ${row.name} - ${day}`);
+                let filenames = [];
+                for (let i = 0; i < settings.variants.length; i++) {
+                    const variant = settings.variants[i];
+                    const filename = generateFilename(row.name, day, variant, settings);
+                    filenames.push(filename);
+                }
+                const images = await scrapeWidgitPage(url, filenames, settings.outputDir);
+                for (const img of images) {
+                    console.log(`Sparade bild till: ${settings.outputDir}/${img}`);
+                }
+            } catch (error) {
+                console.error(`Fel vid hämtning av ${row.name} - ${day}:`, error.message);
+            }
+        }
+    }
+    // Google Slides-schema
+    if (row.type === 'googleslides') {
+        for (const [day, docId] of Object.entries(row.days)) {
+            try {
+                const filename = settings.baseFileNameGoogleSlides
+                    .replace('{row}', row.name)
+                    .replace('{day}', day);
+                const url = baseGoogleSlideUrl + docId;
+                console.log(`Hämtar ${row.name} - ${day}`);
+                const images = await scrapeGoogleSlidesPage(url, filename, settings.outputDir);
+                for (const img of images) {
+                    console.log(`Sparade bild till: ${settings.outputDir}/${img}`);
+                }
+            } catch (error) {
+                console.error(`Fel vid hämtning av Google Slides för ${row.name} - ${day}:`, error.message);
+            }
+        }
+    }
+    console.log(`Schema '${name}' är hämtat!`);
+}
+
+module.exports = { processAll, processSingle };
