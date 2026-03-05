@@ -60,15 +60,14 @@ function cleanupOldImages(rows, settings) {
     }
 }
 
-// GBegränsning för samtidiga Playwright-processer
-const MAX_CONCURRENT = 5;
-
-// Global runQueue-funktion för parallell kö
+// Queue-funktion för parallell kö
 async function runQueue(tasks, maxConcurrent) {
     let index = 0;
     let running = 0;
+
     return new Promise((resolve, reject) => {
         let finished = 0;
+
         function next() {
             while (running < maxConcurrent && index < tasks.length) {
                 running++;
@@ -92,7 +91,7 @@ async function runQueue(tasks, maxConcurrent) {
 }
 
 // Huvudfunktion för att processa alla scheman
-async function processAll() {
+async function processAll(maxConcurrent) {
     console.log("Startar Schemagenerering...");
 
     // Läs in aktuella scheman och inställningar
@@ -127,13 +126,14 @@ async function processAll() {
         }
     }
 
-    await runQueue(tasks, MAX_CONCURRENT);
-    await processAllGoogleSlides();
+    await runQueue(tasks, maxConcurrent);
+    await processAllGoogleSlides(maxConcurrent);
 
     console.log("\nAlla Scheman är hämtade!");
 }
 
-async function processAllGoogleSlides() {
+// Funktion för att processa alla Google Slides-scheman
+async function processAllGoogleSlides(maxConcurrent) {
     console.log("Startar Google Slides-schemagenerering...");
 
     const rows = getRows();
@@ -161,20 +161,12 @@ async function processAllGoogleSlides() {
         }
     }
 
-    await runQueue(tasks, MAX_CONCURRENT);
+    await runQueue(tasks, maxConcurrent);
     console.log("Alla Google Slides-scheman är hämtade!");
 }
 
-// Helper function to generate filenames based on the template in settings.json
-function generateFilename(row, day, variant, settings) {
-    return settings.baseFilename
-        .replace('{row}', row)
-        .replace('{day}', day)
-        .replace('{variant}', variant);
-}
-
 // Funktion för att processa ett enskilt schema
-async function processSingle(name) {
+async function processSingle(name, maxConcurrent) {
     console.log(`Startar omklippning av schema: ${name}`);
     const rows = getRows();
     const settings = getSettings();
@@ -205,7 +197,7 @@ async function processSingle(name) {
                 }
             });
         }
-        await runQueue(widgitTasks, MAX_CONCURRENT);
+        await runQueue(widgitTasks, maxConcurrent);
     }
     // Google Slides-schema parallellt
     const slidesTasks = [];
@@ -227,9 +219,16 @@ async function processSingle(name) {
                 }
             });
         }
-        await runQueue(slidesTasks, MAX_CONCURRENT);
+        await runQueue(slidesTasks, maxConcurrent);
     }
     console.log(`Schema '${name}' är hämtat!`);
+}
+// Helper function to generate filenames based on the template in settings.json
+function generateFilename(row, day, variant, settings) {
+    return settings.baseFilename
+        .replace('{row}', row)
+        .replace('{day}', day)
+        .replace('{variant}', variant);
 }
 
 module.exports = { processAll, processSingle };
