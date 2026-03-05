@@ -10,7 +10,7 @@ async function scrapeWidgitPage(url, filenames, outputDir) {
         const page = await context.newPage();
         let screenshotPaths = [];
 
-        await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+        await page.goto(url, { waitUntil: 'networkidle' });
 
         // Hide menus before taking the screenshots
         await page.evaluate(() => {
@@ -78,7 +78,7 @@ async function scrapeGoogleSlidesPage(url, filename, outputDir) {
         const page = await context.newPage();
         let screenshotPaths = [];
 
-        await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+        await page.goto(url, { waitUntil: 'networkidle' });
 
         // Vänta på SVG-elementet
         const svg = await page.waitForSelector('.sketchyViewerContent svg');
