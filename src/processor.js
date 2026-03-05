@@ -10,6 +10,10 @@ const getSettings = () => JSON.parse(fs.readFileSync(path.join(__dirname, '../co
 const baseWidgetUrl = process.env.WIDGIT_BASE_URL;
 const baseGoogleSlideUrl = process.env.GOOGLE_SLIDES_BASE_URL;
 
+// Max antal samtidiga skrapningar för att undvika överbelastning. 
+// Justera efter behov ( 5 - 10 är rekommenderat).
+const MAX_CONCURRENT = 10;
+
 // Rensar bort bilder som inte längre har ett motsvarande schema
 function cleanupOldImages(rows, settings) {
     const outputDir = path.join(__dirname, '..', settings.outputDir);
@@ -61,7 +65,7 @@ function cleanupOldImages(rows, settings) {
 }
 
 // Queue-funktion för parallell kö
-async function runQueue(tasks, maxConcurrent) {
+async function runQueue(tasks) {
     let index = 0;
     let running = 0;
 
@@ -69,7 +73,7 @@ async function runQueue(tasks, maxConcurrent) {
         let finished = 0;
 
         function next() {
-            while (running < maxConcurrent && index < tasks.length) {
+            while (running < MAX_CONCURRENT && index < tasks.length) {
                 running++;
                 const task = tasks[index++]();
                 task.then(() => {
@@ -91,7 +95,7 @@ async function runQueue(tasks, maxConcurrent) {
 }
 
 // Huvudfunktion för att processa alla scheman
-async function processAll(maxConcurrent) {
+async function processAll() {
     console.log("Startar Schemagenerering...");
 
     // Läs in aktuella scheman och inställningar
@@ -126,14 +130,14 @@ async function processAll(maxConcurrent) {
         }
     }
 
-    await runQueue(tasks, maxConcurrent);
-    await processAllGoogleSlides(maxConcurrent);
+    await runQueue(tasks);
+    await processAllGoogleSlides();
 
     console.log("\nAlla Scheman är hämtade!");
 }
 
 // Funktion för att processa alla Google Slides-scheman
-async function processAllGoogleSlides(maxConcurrent) {
+async function processAllGoogleSlides() {
     console.log("Startar Google Slides-schemagenerering...");
 
     const rows = getRows();
@@ -161,12 +165,12 @@ async function processAllGoogleSlides(maxConcurrent) {
         }
     }
 
-    await runQueue(tasks, maxConcurrent);
+    await runQueue(tasks);
     console.log("Alla Google Slides-scheman är hämtade!");
 }
 
 // Funktion för att processa ett enskilt schema
-async function processSingle(name, maxConcurrent) {
+async function processSingle(name) {
     console.log(`Startar omklippning av schema: ${name}`);
     const rows = getRows();
     const settings = getSettings();
@@ -197,13 +201,13 @@ async function processSingle(name, maxConcurrent) {
                 }
             });
         }
-        await runQueue(widgitTasks, maxConcurrent);
+        await runQueue(widgitTasks);
     }
     // Google Slides-schema parallellt
-    const slidesTasks = [];
+    const googleslidesTasks = [];
     if (row.type === 'googleslides') {
         for (const [day, docId] of Object.entries(row.days)) {
-            slidesTasks.push(async () => {
+            googleslidesTasks.push(async () => {
                 try {
                     const filename = settings.baseFileNameGoogleSlides
                         .replace('{row}', row.name)
@@ -219,7 +223,7 @@ async function processSingle(name, maxConcurrent) {
                 }
             });
         }
-        await runQueue(slidesTasks, maxConcurrent);
+        await runQueue(googleslidesTasks);
     }
     console.log(`Schema '${name}' är hämtat!`);
 }
